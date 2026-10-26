@@ -1,0 +1,297 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Prumo Ferramentas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: cabeçalho fixo com busca, régua em mm como marca, filtros por categoria, grade de produtos e carrinho lateral. */
+:root{
+  --bg:#f3f4f2; --surface:#ffffff; --fg:#17202a; --muted:#5b6670; --line:#d5d9d6;
+  --accent:#1d4e89; --accent-fg:#ffffff; --accent-soft:#e3ecf6; --mark:#e8b923;
+  --ok:#1d7a4b; --warn:#a85a00;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12171c; --surface:#1a2128; --fg:#e8ecef; --muted:#9aa5ae; --line:#2c353d;
+  --accent:#6fa3e0; --accent-fg:#0d1823; --accent-soft:#1e2f42; --mark:#e8b923;
+  --ok:#5cc58d; --warn:#f0a24a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171c; --surface:#1a2128; --fg:#e8ecef; --muted:#9aa5ae; --line:#2c353d;
+  --accent:#6fa3e0; --accent-fg:#0d1823; --accent-soft:#1e2f42; --mark:#e8b923;
+  --ok:#5cc58d; --warn:#f0a24a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+.wrap{max-width:1120px;margin:0 auto}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;padding-block:12px;flex-wrap:wrap}
+.brand{font-family:var(--f-display);font-weight:700;font-size:28px;letter-spacing:.02em;text-transform:uppercase;line-height:1;margin-right:auto;display:flex;align-items:center;gap:10px}
+.brand i{display:inline-block;width:12px;height:28px;background:var(--mark);border:2px solid var(--fg);border-radius:1px}
+.cart-btn{display:flex;align-items:center;gap:10px;background:var(--accent);color:var(--accent-fg);border:0;border-radius:6px;padding:10px 16px;font-weight:600}
+.cart-btn .n{font-family:var(--f-data);background:var(--accent-fg);color:var(--accent);border-radius:99px;min-width:24px;height:24px;display:grid;place-items:center;font-size:13px;padding:0 6px}
+
+.hero{padding-block:36px 8px}
+.hero h1{font-family:var(--f-display);font-weight:700;font-size:clamp(38px,7vw,64px);line-height:.98;margin:0 0 12px;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance;max-width:14ch}
+.hero p{margin:0 0 20px;color:var(--muted);max-width:52ch}
+.search{display:flex;gap:0;max-width:560px}
+.search input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-right:0;border-radius:6px 0 0 6px;padding:12px 14px}
+.search button{background:var(--fg);color:var(--bg);border:0;border-radius:0 6px 6px 0;padding:0 18px;font-weight:600}
+.ruler{height:22px;margin-top:28px;border-bottom:2px solid var(--fg);
+  background:
+   repeating-linear-gradient(90deg,var(--fg) 0 1px,transparent 1px 10px) bottom/100% 8px no-repeat,
+   repeating-linear-gradient(90deg,var(--fg) 0 1px,transparent 1px 50px) bottom/100% 16px no-repeat;opacity:.75}
+.ruler-l{display:flex;justify-content:space-between;font-family:var(--f-data);font-size:11px;color:var(--muted);padding-top:4px}
+
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding-block:20px 12px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.sort{margin-left:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+.count{font-family:var(--f-data);font-size:12px;color:var(--muted);padding-bottom:12px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;padding-bottom:56px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.card .art{background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;height:130px;position:relative}
+.card .art svg{width:110px;height:auto}
+.card .tag{position:absolute;top:10px;left:10px;font-family:var(--f-data);font-size:11px;background:var(--mark);color:#17202a;padding:2px 7px;border-radius:2px;text-transform:uppercase;letter-spacing:.04em}
+.card .body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card h3{margin:0;font-size:16px;font-weight:600;line-height:1.3}
+.cat{font-family:var(--f-data);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.specs{margin:0;padding:0;list-style:none;font-family:var(--f-data);font-size:12px;color:var(--muted);display:grid;gap:2px}
+.stock{font-size:13px;color:var(--ok)}
+.stock.low{color:var(--warn)}
+.price{margin-top:auto;padding-top:6px}
+.price b{font-family:var(--f-display);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.price small{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.add{background:var(--accent);color:var(--accent-fg);border:0;border-radius:6px;padding:10px;font-weight:600}
+.add:hover{filter:brightness(1.08)}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:48px 0}
+
+.info{border-top:1px solid var(--line);padding-block:28px 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;font-size:14px;color:var(--muted)}
+.info b{display:block;color:var(--fg);font-family:var(--f-display);font-size:20px;text-transform:uppercase;letter-spacing:.02em}
+
+.scrim{position:fixed;inset:0;background:rgba(10,14,18,.55);z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);z-index:50;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px);border-left:1px solid var(--line)}
+.drawer header{display:flex;align-items:center;justify-content:space-between;padding:16px;border-bottom:1px solid var(--line)}
+.drawer h2{margin:0;font-family:var(--f-display);font-size:26px;text-transform:uppercase}
+.x{background:none;border:1px solid var(--line);border-radius:6px;width:36px;height:36px}
+.lines{flex:1;overflow:auto;padding:8px 16px}
+.line{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.line .nm{font-weight:500;min-width:0}
+.line .pr{font-family:var(--f-data);font-variant-numeric:tabular-nums;text-align:right}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:28px;height:28px;border:1px solid var(--line);background:var(--bg);border-radius:4px}
+.qty span{font-family:var(--f-data);min-width:24px;text-align:center}
+.rm{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:13px;justify-self:end}
+.foot{border-top:1px solid var(--line);padding:16px;display:grid;gap:10px}
+.tot{display:flex;justify-content:space-between;align-items:baseline}
+.tot b{font-family:var(--f-display);font-size:30px;font-variant-numeric:tabular-nums}
+.pix{font-size:13px;color:var(--ok)}
+.primary{background:var(--accent);color:var(--accent-fg);border:0;border-radius:6px;padding:12px;font-weight:600;text-align:center;text-decoration:none;display:block}
+.ghost{background:none;border:1px solid var(--line);border-radius:6px;padding:10px}
+form.co{display:grid;gap:10px;padding:16px;overflow:auto;flex:1;align-content:start}
+form.co label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+form.co input,form.co textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;color:var(--fg)}
+.note{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:6px;z-index:60;font-size:14px}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}.card:hover{border-color:var(--accent)}}
+</style>
+
+<header class="top"><div class="wrap bar">
+  <div class="brand"><i></i>Prumo Ferramentas</div>
+  <button class="cart-btn" id="openCart" aria-label="Abrir carrinho">Carrinho <span class="n" id="cartN">0</span></button>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Ferramenta certa, medida certa</h1>
+    <p>Estiletes, tesouras, luvas, fixação, chaves e abrasivos para oficina, obra e manutenção. Escolha, monte o carrinho e envie o pedido pelo WhatsApp.</p>
+    <form class="search" id="searchForm" role="search">
+      <input id="q" type="search" placeholder="Buscar: chave combinada, estilete, luva…" aria-label="Buscar produtos">
+      <button type="submit">Buscar</button>
+    </form>
+    <div class="ruler" aria-hidden="true"></div>
+    <div class="ruler-l" aria-hidden="true"><span>0 mm</span><span>50</span><span>100</span><span>150</span><span>200</span></div>
+  </section>
+
+  <div class="filters" id="chips"></div>
+  <div class="filters" style="padding-top:0"><span class="count" id="count"></span>
+    <select class="sort" id="sort" aria-label="Ordenar"><option value="rel">Em destaque</option><option value="asc">Menor preço</option><option value="desc">Maior preço</option><option value="az">Nome (A–Z)</option></select>
+  </div>
+  <section class="grid" id="grid" aria-live="polite"></section>
+
+  <section class="info">
+    <div><b>Pedido pelo WhatsApp</b>Monte o carrinho e envie. Confirmamos os itens e o pagamento na conversa.</div>
+    <div><b>Retire ou receba</b>Retirada na loja ou entrega, a combinar pelo WhatsApp.</div>
+  </section>
+</main>
+
+<div id="layer"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* Troque pelo WhatsApp da loja (código do país + DDD + número, só dígitos). */
+var WHATSAPP = "5582993186448";
+
+var CATS = ["Corte e acabamento","Proteção","Fixação","Chaves","Abrasivos"];
+var P = [
+ {id:1,n:"Estilete tradicional 18 mm",c:"Corte e acabamento",p:4.53,s:["Lâmina 18 mm"]},
+ {id:2,n:"Estilete profissional emborrachado",c:"Corte e acabamento",p:9.51,s:["Cabo emborrachado"]},
+ {id:3,n:"Tesoura de inox 5,5\" (não escolar)",c:"Corte e acabamento",p:6.93,s:["5,5 polegadas","Inox"]},
+ {id:4,n:"Tesoura de inox ponta reta",c:"Corte e acabamento",p:5.21,s:["Inox","Ponta reta"]},
+ {id:5,n:"Tesoura de inox ponta redonda",c:"Corte e acabamento",p:5.21,s:["Inox","Ponta redonda"]},
+ {id:6,n:"Espátula 2\" com cabo emborrachado",c:"Corte e acabamento",p:6.79,s:["2 polegadas","Cabo emborrachado"]},
+ {id:7,n:"Luva pigmentada preta (1 par)",c:"Proteção",p:7.93,s:["1 par","Cor preta"]},
+ {id:8,n:"Luva pigmentada (1 par)",c:"Proteção",p:7.93,s:["1 par"]},
+ {id:9,n:"Abraçadeira de nylon 3,6 x 100 mm (c/ 100)",c:"Fixação",p:6.23,s:["3,6 x 100 mm","Pacote com 100 peças"]},
+ {id:10,n:"Abraçadeira de nylon 3,6 x 150 mm (c/ 100)",c:"Fixação",p:6.11,s:["3,6 x 150 mm","Pacote com 100 peças"]},
+ {id:11,n:"Fita adesiva dupla face 1,7 cm x 5 m",c:"Fixação",p:5.89,s:["Largura 1,7 cm","Comprimento 5 m"]},
+ {id:12,n:"Jogo de chaves Allen (8 peças)",c:"Chaves",p:6.11,s:["8 peças"]},
+ {id:13,n:"Chave combinada 19 mm",c:"Chaves",p:19.81,s:["Medida 19 mm"]},
+ {id:14,n:"Disco flap grão 120",c:"Abrasivos",p:5.66,s:["Grão 120"]}
+];
+
+var ICONS = {
+ "Chaves":'<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M34 35H92"/><path d="M34 35L22 24V14L12 14M34 35L22 46V56L12 56" /><circle cx="98" cy="35" r="12"/></svg>',
+ "Corte e acabamento":'<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 44L74 20L104 20L104 44Z"/><path d="M74 20L74 44M88 32H96"/></svg>',
+ "Proteção":'<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M40 62V34L32 22M52 34V12M64 34V8M76 34V14M88 40V22M40 62H88V44"/></svg>',
+ "Fixação":'<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H52V50H20Z"/><path d="M52 35H104M66 28V42M80 28V42M94 28V42"/></svg>',
+ "Abrasivos":'<svg viewBox="0 0 120 70" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="60" cy="35" r="28"/><circle cx="60" cy="35" r="6"/><path d="M60 7V29M60 41V63M32 35H54M66 35H88"/></svg>'
+};
+
+var brl = new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"});
+var state = {cat:"Todas", q:"", sort:"rel", cart:{}, step:"cart"};
+try{ var saved = JSON.parse(localStorage.getItem("prumo-cart")||"{}"); if(saved && typeof saved==="object") state.cart = saved; }catch(e){}
+function persist(){ try{ localStorage.setItem("prumo-cart", JSON.stringify(state.cart)); }catch(e){} }
+function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""); }
+function byId(id){ return P.find(function(x){return x.id===id;}); }
+function $(id){ return document.getElementById(id); }
+
+function renderChips(){
+  var all = ["Todas"].concat(CATS);
+  $("chips").innerHTML = all.map(function(c){
+    return '<button class="chip" data-c="'+c+'" aria-pressed="'+(state.cat===c)+'">'+c+'</button>';
+  }).join("");
+}
+function list(){
+  var q = norm(state.q).trim().replace(/\s+/g," ");
+  var r = P.filter(function(x){
+    if(state.cat!=="Todas" && x.c!==state.cat) return false;
+    if(!q) return true;
+    var hay = norm(x.n+" "+x.c+" "+x.s.join(" ")).replace(/(\d)\s+mm/g,"$1mm");
+    var qq = q.replace(/(\d)\s+mm/g,"$1mm");
+    return qq.split(" ").every(function(w){ return hay.indexOf(w)>-1; });
+  });
+  if(state.sort==="asc") r.sort(function(a,b){return a.p-b.p;});
+  if(state.sort==="desc") r.sort(function(a,b){return b.p-a.p;});
+  if(state.sort==="az") r.sort(function(a,b){return a.n.localeCompare(b.n,"pt-BR");});
+  return r;
+}
+function renderGrid(){
+  var r = list();
+  $("count").textContent = r.length+" produto"+(r.length===1?"":"s");
+  if(!r.length){ $("grid").innerHTML='<div class="empty">Nenhum produto encontrado. Tente outro termo ou escolha “Todas”.</div>'; return; }
+  $("grid").innerHTML = r.map(function(x){
+    return '<article class="card"><div class="art">'+ICONS[x.c]+'</div>'+
+    '<div class="body"><span class="cat">'+x.c+'</span><h3>'+x.n+'</h3>'+
+    '<ul class="specs">'+x.s.map(function(s){return '<li>'+s+'</li>';}).join("")+'</ul>'+
+    '<div class="price"><b>'+brl.format(x.p)+'</b><small>por unidade</small></div>'+
+    '<button class="add" data-add="'+x.id+'">Adicionar ao carrinho</button></div></article>';
+  }).join("");
+}
+function totals(){
+  var n=0,t=0; Object.keys(state.cart).forEach(function(k){ var p=byId(+k); if(p){ n+=state.cart[k]; t+=p.p*state.cart[k]; } });
+  return {n:n,t:t};
+}
+function renderBadge(){ $("cartN").textContent = totals().n; }
+function toast(m){ var t=$("toast"); t.textContent=m; t.hidden=false; clearTimeout(toast.h); toast.h=setTimeout(function(){t.hidden=true;},1800); }
+
+function add(id,d){
+  var cur = state.cart[id]||0, p = byId(id), nx = Math.max(0,Math.min(99,cur+d));
+  if(nx===0) delete state.cart[id]; else state.cart[id]=nx;
+  persist(); renderBadge(); if($("drawer")) renderDrawer();
+}
+
+function openCart(step){ state.step = step||"cart"; renderDrawer(); }
+function closeCart(){ $("layer").innerHTML=""; }
+function renderDrawer(){
+  var T = totals(), keys = Object.keys(state.cart);
+  var html = '<div class="scrim" id="scrim"></div><aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Carrinho">';
+  html += '<header><h2>'+(state.step==="cart"?"Seu carrinho":"Finalizar pedido")+'</h2><button class="x" id="closeCart" aria-label="Fechar">✕</button></header>';
+  if(state.step==="cart"){
+    if(!keys.length){
+      html += '<div class="lines"><p class="empty" style="padding:40px 0">Seu carrinho está vazio.</p></div></aside>';
+    } else {
+      html += '<div class="lines">'+keys.map(function(k){ var p=byId(+k), q=state.cart[k];
+        return '<div class="line"><div class="nm">'+p.n+'</div><div class="pr">'+brl.format(p.p*q)+'</div>'+
+        '<div class="qty"><button data-d="-1" data-id="'+k+'" aria-label="Diminuir">−</button><span>'+q+'</span><button data-d="1" data-id="'+k+'" aria-label="Aumentar">+</button></div>'+
+        '<button class="rm" data-rm="'+k+'">Remover</button></div>'; }).join("")+'</div>';
+      html += '<div class="foot"><div class="tot"><span>Total</span><b>'+brl.format(T.t)+'</b></div>        '<button class="primary" id="goCheckout">Continuar</button></div></aside>';
+    }
+  } else {
+    html += '<form class="co" id="coForm"><label>Nome<input id="fNome" required autocomplete="name"></label>'+
+      '<label>Telefone com DDD<input id="fTel" required inputmode="tel" autocomplete="tel" placeholder="(47) 90000-0000"></label>'+
+      '<label>Como prefere receber?<select id="fEnt" class="sort" style="margin:0;width:100%"><option>Retirar na loja</option><option>Entrega no endereço</option></select></label>'+
+      '<label>Endereço (se for entrega)<textarea id="fEnd" rows="2" autocomplete="street-address"></textarea></label>'+
+      '<label>Pagamento<select id="fPag" class="sort" style="margin:0;width:100%"><option>Pix</option><option>Cartão</option><option>Dinheiro</option></select></label>'+
+      '<p class="note">O pedido é enviado por mensagem no WhatsApp. O pagamento e a entrega são confirmados na conversa.</p></form>'+
+      '<div class="foot"><div class="tot"><span>Total</span><b>'+brl.format(T.t)+'</b></div>'+
+      '<a class="primary" id="waLink" href="#" target="_blank" rel="noopener">Enviar pedido pelo WhatsApp</a>'+
+      '<button class="ghost" id="copyOrder" type="button">Copiar texto do pedido</button>'+
+      '<button class="ghost" id="backCart" type="button">Voltar ao carrinho</button></div></aside>';
+  }
+  $("layer").innerHTML = html;
+  if(state.step==="checkout") updateLink();
+}
+function orderText(){
+  var T = totals(), L = [];
+  L.push("*Pedido - Prumo Ferramentas*","");
+  Object.keys(state.cart).forEach(function(k){ var p=byId(+k), q=state.cart[k]; L.push(q+"x "+p.n+" - "+brl.format(p.p*q)); });
+  L.push("","Total: "+brl.format(T.t));
+  var g=function(i){ var e=$(i); return e?e.value.trim():""; };
+  L.push("","Nome: "+g("fNome"),"Telefone: "+g("fTel"),"Recebimento: "+g("fEnt"));
+  if(g("fEnd")) L.push("Endereço: "+g("fEnd"));
+  L.push("Pagamento: "+g("fPag"));
+  return L.join("\n");
+}
+function updateLink(){ var a=$("waLink"); if(a) a.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(orderText()); }
+
+document.addEventListener("click",function(e){
+  var t = e.target;
+  if(t.closest("[data-c]")){ state.cat = t.closest("[data-c]").dataset.c; renderChips(); renderGrid(); return; }
+  if(t.closest("[data-add]")){ var id=+t.closest("[data-add]").dataset.add; add(id,1); toast("Adicionado: "+byId(id).n); return; }
+  if(t.closest("#openCart")){ openCart("cart"); return; }
+  if(t.id==="scrim"||t.closest("#closeCart")){ closeCart(); return; }
+  if(t.closest("[data-d]")){ var b=t.closest("[data-d]"); add(+b.dataset.id,+b.dataset.d); return; }
+  if(t.closest("[data-rm]")){ var k=+t.closest("[data-rm]").dataset.rm; delete state.cart[k]; persist(); renderBadge(); renderDrawer(); return; }
+  if(t.id==="goCheckout"){ state.step="checkout"; renderDrawer(); return; }
+  if(t.id==="backCart"){ state.step="cart"; renderDrawer(); return; }
+  if(t.id==="waLink"){
+    var f=$("coForm"); if(f && !f.checkValidity()){ e.preventDefault(); f.reportValidity(); }
+    else updateLink();
+    return;
+  }
+  if(t.id==="copyOrder"){
+    var txt=orderText(), ok=function(){toast("Pedido copiado");};
+    try{ navigator.clipboard.writeText(txt).then(ok,function(){toast("Não foi possível copiar");}); }catch(err){ toast("Não foi possível copiar"); }
+  }
+});
+document.addEventListener("input",function(e){ if(e.target.closest("#coForm")) updateLink(); });
+document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeCart(); });
+$("searchForm").addEventListener("submit",function(e){ e.preventDefault(); state.q=$("q").value; renderGrid(); });
+$("q").addEventListener("input",function(){ state.q=this.value; renderGrid(); });
+$("sort").addEventListener("change",function(){ state.sort=this.value; renderGrid(); });
+
+/* Remove itens de um carrinho salvo que não existem mais no catálogo. */
+Object.keys(state.cart).forEach(function(k){ if(!byId(+k)) delete state.cart[k]; });
+renderChips(); renderGrid(); renderBadge();
+</script>
+
+</body></html>
